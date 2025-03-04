@@ -12,6 +12,11 @@ import Page4 from "../assets/page 4.png";
 import Page5 from "../assets/page 5.png";
 
 export default function HomePage() {
+  const onLogout = () => {
+    localStorage.removeItem("user");
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
@@ -36,11 +41,13 @@ export default function HomePage() {
             Price
           </Link>
         </div>
-        <Link to="/login">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
-            Login
-          </Button>
-        </Link>
+
+        <Button
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
+          onClick={onLogout}
+        >
+          Logout
+        </Button>
       </nav>
 
       {/* Hero Section 1 */}

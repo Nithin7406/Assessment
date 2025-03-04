@@ -1,4 +1,6 @@
-LoginPage.jsx;
+import { useState } from "react";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { Link, Navigate } from "react-router-dom";
 import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa";
 import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
 import { Input } from "@/components/ui/input";
@@ -6,31 +8,50 @@ import { Button } from "@/components/ui/button";
 import logo from "../assets/logo.png";
 import illustration from "../assets/illustration.png";
 import googlelogo from "../assets/googlelogo.png";
-import { useState } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function LoginPage({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
 
   const auth = getAuth();
 
   const handleLogin = () => {
-    createUserWithEmailAndPassword(auth, email, password)
+    setEmailError("");
+    setPasswordError("");
+
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+      return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
         const user = userCredential.user;
         console.log(user);
         setUser(user);
+        if (keepSignedIn) {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
 
-        localStorage.setItem("user", JSON.stringify(user));
-        // ...
+        Navigate("/");
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        // ..
+        if (error.code === "auth/invalid-email") {
+          setEmailError("Invalid email format");
+        } else if (error.code === "auth/user-not-found") {
+          setEmailError("No user found with this email");
+        } else if (error.code === "auth/wrong-password") {
+          setPasswordError("Incorrect password");
+        } else {
+          setEmailError("Login failed. Please try again.");
+        }
       });
   };
 
@@ -46,7 +67,6 @@ export default function LoginPage({ setUser }) {
 
       {/* Right Side - Login Form */}
       <div className="w-full md:w-1/2 p-50 flex flex-col justify-center">
-        {/* Logo and Heading */}
         <div className="flex flex-col items-center">
           <div className="flex items-center space-x-2">
             <img src={logo} alt="Talkmate Logo" className="w-23 h-20" />
@@ -57,31 +77,45 @@ export default function LoginPage({ setUser }) {
 
         {/* Input Fields */}
         <div className="space-y-4 mt-6">
-          <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
-            <AiOutlineMail className="text-gray-400 text-lg" />
-            <Input
-              type="email"
-              placeholder="Email"
-              className="w-full pl-2 outline-none border-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <div className="flex flex-col">
+            <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
+              <AiOutlineMail className="text-gray-400 text-lg" />
+              <Input
+                type="email"
+                placeholder="Email"
+                className="w-full pl-2 outline-none border-none"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
           </div>
 
-          <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
-            <AiOutlineLock className="text-gray-400 text-lg" />
-            <Input
-              type="password"
-              placeholder="Password"
-              className="w-full pl-2 outline-none border-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <div className="flex flex-col">
+            <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
+              <AiOutlineLock className="text-gray-400 text-lg" />
+              <Input
+                type="password"
+                placeholder="Password"
+                className="w-full pl-2 outline-none border-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            {passwordError && (
+              <p className="text-red-500 text-sm">{passwordError}</p>
+            )}
           </div>
 
           {/* Keep me signed in */}
           <div className="flex items-center text-sm space-x-2">
-            <input type="checkbox" id="remember" className="cursor-pointer" />
+            <input
+              type="checkbox"
+              id="remember"
+              className="cursor-pointer"
+              value={keepSignedIn}
+              onChange={(e) => setKeepSignedIn(e.target.checked)}
+            />
             <label htmlFor="remember" className="text-gray-600">
               Keep me signed in
             </label>
@@ -89,9 +123,12 @@ export default function LoginPage({ setUser }) {
 
           {/* Forgot Password */}
           <div className="text-right text-sm">
-            <a href="#" className="text-black-500 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-black-500 hover:underline"
+            >
               Forgot Password?
-            </a>
+            </Link>
           </div>
 
           {/* Login Button */}
@@ -125,9 +162,12 @@ export default function LoginPage({ setUser }) {
         {/* Register Link */}
         <div className="mt-6 text-center text-sm">
           Don’t have an account?{" "}
-          <a href="#" className="text-blue-500 font-medium hover:underline">
+          <Link
+            to="/signup"
+            className="text-blue-500 font-medium hover:underline"
+          >
             Register Now
-          </a>
+          </Link>
         </div>
       </div>
     </div>
