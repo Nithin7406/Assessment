@@ -1,3 +1,4 @@
+LoginPage.jsx;
 import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa";
 import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
 import { Input } from "@/components/ui/input";
@@ -6,14 +7,36 @@ import logo from "../assets/logo.png";
 import illustration from "../assets/illustration.png";
 import googlelogo from "../assets/googlelogo.png";
 import { useState } from "react";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-export default function LoginPage() {
+export default function LoginPage({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const auth = getAuth();
+
+  const handleLogin = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+        setUser(user);
+
+        localStorage.setItem("user", JSON.stringify(user));
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        // ..
+      });
+  };
+
   return (
     <div className="fixed inset-0 flex w-full h-full">
-      <div className="absolute top-[-500px] left-[-200px] w-[700px] h-[700px] bg-gradient-to-br from-purple-500 to-blue-500 rounded-full"></div>
+      <div className="absolute top-[-500px] left-[-200px] w-[700px] h-[700px] bg-gradient-to-br from-[#FF90C6] to-[#002aff] rounded-full"></div>
       <div className="absolute bottom-[-160px] right-[-350px] w-[400px] h-[400px] bg-gradient-to-bl from-[#b6c4ff61] to-[#ff9ecdd9] rounded-full"></div>
 
       {/* Left Side - Illustration */}
@@ -22,11 +45,11 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full md:w-1/2 p-45 flex flex-col justify-center">
+      <div className="w-full md:w-1/2 p-50 flex flex-col justify-center">
         {/* Logo and Heading */}
         <div className="flex flex-col items-center">
           <div className="flex items-center space-x-2">
-            <img src={logo} alt="Talkmate Logo" className="w-25 h-25" />
+            <img src={logo} alt="Talkmate Logo" className="w-23 h-20" />
             <h2 className="text-3xl font-semibold">Talkmate</h2>
           </div>
           <p className="text-xl font-bold">Login</p>
@@ -40,6 +63,8 @@ export default function LoginPage() {
               type="email"
               placeholder="Email"
               className="w-full pl-2 outline-none border-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -49,6 +74,8 @@ export default function LoginPage() {
               type="password"
               placeholder="Password"
               className="w-full pl-2 outline-none border-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -68,7 +95,10 @@ export default function LoginPage() {
           </div>
 
           {/* Login Button */}
-          <Button className="w-full bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium transition-all hover:opacity-80">
+          <Button
+            className="w-full bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium transition-all hover:opacity-80"
+            onClick={handleLogin}
+          >
             Login
           </Button>
         </div>
