@@ -20,6 +20,7 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import logo from "../assets/logo.png";
 import illustration from "../assets/illustration.png";
 import Signup from "../assets/Signup.png";
+import { Link } from "react-router-dom";
 
 export default function SignUpPage({ setUser }) {
   const [firstName, setFirstName] = useState("");
@@ -174,20 +175,25 @@ export default function SignUpPage({ setUser }) {
             value={mobileNumber}
             setValue={setMobileNumber}
           />
-          <InputField
-            icon={<FaMapMarkerAlt />}
-            placeholder="Address"
-            value={address}
-            setValue={setAddress}
-            isTextarea
-          />
+          <div className="col-span-2 flex flex-col">
+            <InputField
+              icon={<FaMapMarkerAlt />}
+              placeholder="Address"
+              value={address}
+              setValue={setAddress}
+              isTextarea={true} // Ensure it renders as a textarea
+            />
+          </div>
+
           <InputField
             icon={<MdLocationOn />}
             placeholder="Pin Code"
             value={pinCode}
             setValue={setPinCode}
+            className="flex-1"
           />
-          <SelectField value={state} setValue={setState} />
+          <SelectField value={state} setValue={setState} className="flex-1" />
+
           <InputField
             icon={<AiOutlineLock />}
             type="password"
@@ -209,23 +215,18 @@ export default function SignUpPage({ setUser }) {
           className="w-full bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium transition-all hover:opacity-80 mt-6"
           onClick={handleSignUp}
         >
-          Sign Up
+          Create Account
         </Button>
-
-        {/* Google Sign-Up */}
-        {/* <Button
-          className="w-full bg-red-500 text-white py-2 rounded-lg text-lg font-medium transition-all hover:opacity-80 mt-4"
-          onClick={handleGoogleSignUp}
-        >
-          Sign Up with Google
-        </Button> */}
 
         {/* Already have an account */}
         <div className="mt-6 text-center text-sm">
           Already have an account?{" "}
-          <a href="#" className="text-blue-500 font-medium hover:underline">
+          <Link
+            to="/login"
+            className="text-blue-500 font-medium hover:underline"
+          >
             Login Now
-          </a>
+          </Link>
         </div>
       </div>
     </div>
@@ -238,34 +239,29 @@ function InputField({
   placeholder,
   value,
   setValue,
-  isTextarea,
+  className = "",
 }) {
   return (
-    <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm w-full">
+    <div
+      className={`flex items-center border rounded-lg px-4 py-2 shadow-sm w-full ${className}`}
+    >
       {icon}
-      {isTextarea ? (
-        <textarea
-          placeholder={placeholder}
-          className="w-full pl-2 outline-none border-none h-20"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-      ) : (
-        <Input
-          type={type}
-          placeholder={placeholder}
-          className="w-full pl-2 outline-none border-none"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-      )}
+      <Input
+        type={type}
+        placeholder={placeholder}
+        className="w-full pl-2 outline-none border-none"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
     </div>
   );
 }
 
-function SelectField({ value, setValue }) {
+function SelectField({ value, setValue, className = "" }) {
   return (
-    <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
+    <div
+      className={`flex items-center border rounded-lg px-4 py-2 shadow-sm ${className}`}
+    >
       <MdLocationOn className="text-gray-400 text-lg" />
       <select
         className="w-full pl-2 outline-none border-none"

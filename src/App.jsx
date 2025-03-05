@@ -15,6 +15,7 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    console.log(storedUser);
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -23,16 +24,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            user ? (
-              <HomePage setUser={setUser} />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+        <Route path="/" element={<HomePage setUser={setUser} user={user} />} />
         <Route
           path="/login"
           element={
