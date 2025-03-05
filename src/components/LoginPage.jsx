@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { Link, Navigate } from "react-router-dom";
 import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa";
-import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
+import { AiOutlineMail, AiOutlineLock, AiOutlinePhone } from "react-icons/ai";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import logo from "../assets/logo.png";
@@ -10,49 +10,73 @@ import illustration from "../assets/illustration.png";
 import googlelogo from "../assets/googlelogo.png";
 
 export default function LoginPage({ setUser }) {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // Can be email or phone
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [keepSignedIn, setKeepSignedIn] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState(null);
+  const [isPhoneLogin, setIsPhoneLogin] = useState(false);
 
   const auth = getAuth();
+
+  // Email & Phone Number Validation
+  const isEmail = (input) => /\S+@\S+\.\S+/.test(input);
+  const isPhone = (input) => /^\+?\d{10,15}$/.test(input); // Simple phone validation
+
+  const generateRandomOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit OTP
+  };
 
   const handleLogin = () => {
     setEmailError("");
     setPasswordError("");
 
-    if (!email) {
-      setEmailError("Email is required");
-      return;
-    }
-    if (!password) {
-      setPasswordError("Password is required");
+    if (!identifier) {
+      setEmailError("Email or phone number is required");
       return;
     }
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        setUser(user);
-        if (keepSignedIn) {
-          localStorage.setItem("user", JSON.stringify(user));
-        }
+    if (isEmail(identifier)) {
+      signInWithEmailAndPassword(auth, identifier, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          setUser(user);
+          if (keepSignedIn) {
+            localStorage.setItem("user", JSON.stringify(user));
+          }
+          Navigate("/");
+        })
+        .catch((error) => {
+          if (error.code === "auth/invalid-email") {
+            setEmailError("Invalid email format");
+          } else if (error.code === "auth/user-not-found") {
+            setEmailError("No user found with this email");
+          } else if (error.code === "auth/wrong-password") {
+            setPasswordError("Incorrect password");
+          } else {
+            setEmailError("Login failed. Please try again.");
+          }
+        });
+    } else if (isPhone(identifier)) {
+      setIsPhoneLogin(true);
+      const randomOtp = generateRandomOTP();
+      setGeneratedOtp(randomOtp);
+      alert(`Your OTP is: ${randomOtp}`); // Shows OTP in an alert
+    } else {
+      setEmailError("Invalid email or phone number format.");
+    }
+  };
 
-        Navigate("/");
-      })
-      .catch((error) => {
-        if (error.code === "auth/invalid-email") {
-          setEmailError("Invalid email format");
-        } else if (error.code === "auth/user-not-found") {
-          setEmailError("No user found with this email");
-        } else if (error.code === "auth/wrong-password") {
-          setPasswordError("Incorrect password");
-        } else {
-          setEmailError("Login failed. Please try again.");
-        }
-      });
+  const verifyOTP = () => {
+    if (otp === generatedOtp) {
+      alert("Login Successful!");
+      setUser({ phone: identifier });
+      Navigate("/");
+    } else {
+      setEmailError("Invalid OTP. Please try again.");
+    }
   };
 
   return (
@@ -79,33 +103,54 @@ export default function LoginPage({ setUser }) {
         <div className="space-y-4 mt-6">
           <div className="flex flex-col">
             <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
-              <AiOutlineMail className="text-gray-400 text-lg" />
+              {isPhone(identifier) ? (
+                <AiOutlinePhone className="text-gray-400 text-lg" />
+              ) : (
+                <AiOutlineMail className="text-gray-400 text-lg" />
+              )}
               <Input
-                type="email"
-                placeholder="Email"
+                type="text"
+                placeholder="Email or Phone"
                 className="w-full pl-2 outline-none border-none"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
               />
             </div>
             {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
           </div>
 
-          <div className="flex flex-col">
-            <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
-              <AiOutlineLock className="text-gray-400 text-lg" />
-              <Input
-                type="password"
-                placeholder="Password"
-                className="w-full pl-2 outline-none border-none"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+          {!isPhoneLogin && (
+            <div className="flex flex-col">
+              <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
+                <AiOutlineLock className="text-gray-400 text-lg" />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  className="w-full pl-2 outline-none border-none"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {passwordError && (
+                <p className="text-red-500 text-sm">{passwordError}</p>
+              )}
             </div>
-            {passwordError && (
-              <p className="text-red-500 text-sm">{passwordError}</p>
-            )}
-          </div>
+          )}
+
+          {isPhoneLogin && (
+            <div className="flex flex-col">
+              <Input
+                type="text"
+                placeholder="Enter OTP"
+                className="w-full pl-2 outline-none border-none"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+              <Button className="mt-2 w-full" onClick={verifyOTP}>
+                Verify OTP
+              </Button>
+            </div>
+          )}
 
           {/* Keep me signed in */}
           <div className="flex items-center text-sm space-x-2">
@@ -113,7 +158,7 @@ export default function LoginPage({ setUser }) {
               type="checkbox"
               id="remember"
               className="cursor-pointer"
-              value={keepSignedIn}
+              checked={keepSignedIn}
               onChange={(e) => setKeepSignedIn(e.target.checked)}
             />
             <label htmlFor="remember" className="text-gray-600">
@@ -121,42 +166,15 @@ export default function LoginPage({ setUser }) {
             </label>
           </div>
 
-          {/* Forgot Password */}
-          <div className="text-right text-sm">
-            <Link
-              to="/forgot-password"
-              className="text-black-500 hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-
           {/* Login Button */}
-          <Button
-            className="w-full bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium transition-all hover:opacity-80"
-            onClick={handleLogin}
-          >
-            Login
-          </Button>
-        </div>
-
-        {/* Or Login with */}
-        <div className="flex items-center my-4">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="mx-4 text-gray-500 text-sm">Or Login with</span>
-          <div className="flex-grow border-t border-gray-300"></div>
-        </div>
-        <div className="flex justify-center space-x-4">
-          <button className="p-4 rounded-lg border border-gray-300 bg-white flex items-center justify-center w-25 h-12 hover:shadow-lg">
-            <FaFacebook className="text-blue-600 text-2xl" />
-          </button>
-          <button className="p-4 rounded-lg border border-gray-300 bg-white flex items-center justify-center w-24 h-12 hover:shadow-lg">
-            <img src={googlelogo} alt="Google" className="w-6 h-6" />
-          </button>
-
-          <button className="p-4 rounded-lg border border-gray-300 bg-white flex items-center justify-center w-25 h-12 hover:shadow-lg">
-            <FaApple className="text-black text-2xl" />
-          </button>
+          {!isPhoneLogin && (
+            <Button
+              className="w-full bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium transition-all hover:opacity-80"
+              onClick={handleLogin}
+            >
+              Login
+            </Button>
+          )}
         </div>
 
         {/* Register Link */}
