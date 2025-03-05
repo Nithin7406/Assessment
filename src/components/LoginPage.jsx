@@ -158,7 +158,7 @@ export default function LoginPage({ setUser }) {
                 />
               </div>
               <Button
-                className="w-full bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium"
+                className="w-full mt-5 bg-gradient-to-b from-[#ff90c69e] to-[#3153FF] text-white py-2 rounded-lg text-lg font-medium"
                 onClick={verifyOTP}
               >
                 Verify OTP
