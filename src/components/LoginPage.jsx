@@ -10,7 +10,7 @@ import illustration from "../assets/illustration.png";
 import googlelogo from "../assets/googlelogo.png";
 
 export default function LoginPage({ setUser }) {
-  const [identifier, setIdentifier] = useState(""); // Email or phone
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState(null);
@@ -22,7 +22,6 @@ export default function LoginPage({ setUser }) {
   const navigate = useNavigate();
   const auth = getAuth();
 
-  // Validation functions
   const isEmail = (input) => /\S+@\S+\.\S+/.test(input);
   const isPhone = (input) => /^\+?\d{10,15}$/.test(input);
 
@@ -73,7 +72,7 @@ export default function LoginPage({ setUser }) {
       setOtpSent(true);
       const randomOtp = generateRandomOTP();
       setGeneratedOtp(randomOtp);
-      alert(`Your OTP is: ${randomOtp}`); // Simulate sending OTP
+      alert(`Your OTP is: ${randomOtp}`);
     } else {
       setEmailError("Invalid email or phone number format.");
     }
@@ -105,7 +104,6 @@ export default function LoginPage({ setUser }) {
           <p className="text-xl font-bold">Login</p>
         </div>
 
-        {/* Input Fields */}
         <div className="space-y-4 mt-6 max-w-md mx-auto w-full">
           <div className="flex flex-col">
             <div className="flex items-center border rounded-lg px-4 py-2 shadow-sm">
@@ -121,7 +119,7 @@ export default function LoginPage({ setUser }) {
                 value={identifier}
                 onChange={(e) => {
                   setIdentifier(e.target.value);
-                  setOtpSent(false); // Reset OTP state if user changes input
+                  setOtpSent(false);
                 }}
               />
             </div>
@@ -176,7 +174,6 @@ export default function LoginPage({ setUser }) {
           )}
         </div>
 
-        {/* Register & Social Login */}
         <div className="mt-6 text-center text-sm">
           Don't have an account?{" "}
           <Link
@@ -185,7 +182,6 @@ export default function LoginPage({ setUser }) {
           >
             Register Now
           </Link>
-          {/* Or Login with */}
           <div className="flex items-center my-4">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="mx-4 text-gray-500 text-sm">Or Login with</span>

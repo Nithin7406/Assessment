@@ -3,13 +3,11 @@ import illustration from "../assets/leave-tracker-illustration.png";
 
 const LeaveTrackerPromo = () => {
   const onSignup = () => {
-    // Example action: redirecting to a signup page
     window.location.href = "/signup";
   };
 
   return (
     <div className="bg-[#1E3270] text-white rounded-[32px] px-6 md:px-12 py-14 flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto my-16 md:my-20">
-      {/* Left Illustration */}
       <div className="w-full md:w-[40%] flex justify-center md:justify-start">
         <img
           src={illustration}
@@ -18,7 +16,6 @@ const LeaveTrackerPromo = () => {
         />
       </div>
 
-      {/* Right Content */}
       <div className="w-full md:w-[55%] text-center md:text-left mt-10 md:mt-0">
         <p className="text-base md:text-[28px] mb-8">
           LeaveTracker is available as a Discord, Microsoft Teams, and Google
