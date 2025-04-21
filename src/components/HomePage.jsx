@@ -12,6 +12,8 @@ import PolicyForm from "../assets/PolicyForm.png";
 import Page3 from "../assets/page 3.png";
 import Page4 from "../assets/page 4.png";
 import Page5 from "../assets/page 5.png";
+import Footer from "./Footer";
+import LeaveTrackerPromo from "./LeaveTrackerPromo";
 
 export default function HomePage({ user }) {
   const navigate = useNavigate();
@@ -37,8 +39,11 @@ export default function HomePage({ user }) {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-6 md:px-10 py-4 shadow-sm bg-white relative">
-        <div className="flex items-center space-x-2">
+      <nav className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-10 py-4 shadow-sm bg-white">
+        <div
+          className="flex items-center space-x-2 cursor-pointer"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
           <img src={Icon} alt="Logo" className="w-8 h-8" />
           <span className="text-xl font-semibold text-gray-800">
             Leave<span className="text-blue-600">Tracker</span>
@@ -130,7 +135,10 @@ export default function HomePage({ user }) {
             <strong>EOD</strong>.
           </p>
           <div className="flex justify-center md:justify-start space-x-4 mt-6">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2">
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
+              onClick={onSignup}
+            >
               <span>Sign up now</span> <AiOutlineArrowRight />
             </Button>
             <Button className="border border-blue-600 text-blue-600 px-6 py-2 rounded-lg">
@@ -202,16 +210,18 @@ export default function HomePage({ user }) {
         />
       </section>
 
-      <section className="py-20 flex justify-center">
+      {/* <section className="py-20 flex justify-center">
         <img
           src={Page4}
           alt="Integration Banner"
           className="w-full max-w-7xl object-contain cursor-pointer"
           onClick={onSignup}
         />
-      </section>
+      </section> */}
 
-      {/* Footer */}
+      <LeaveTrackerPromo />
+
+      {/* Footer
       <footer className="bg-gray-900 text-white py-10 flex justify-center">
         <img
           src={Page5}
@@ -219,6 +229,9 @@ export default function HomePage({ user }) {
           className="w-full max-w-6xl object-contain"
         />
       </footer>
+       */}
+      {/* Footer   */}
+      <Footer />
     </div>
   );
 }
