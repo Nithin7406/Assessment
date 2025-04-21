@@ -110,8 +110,8 @@ export default function SignUpPage({ setUser }) {
       const user = result.user;
 
       await setDoc(doc(db, "users", user.uid), {
-        firstName: user.displayName.split(" ")[0] || "",
-        lastName: user.displayName.split(" ")[1] || "",
+        firstName: user.displayName?.split(" ")[0] || "",
+        lastName: user.displayName?.split(" ")[1] || "",
         email: user.email,
         mobileNumber: user.phoneNumber || "",
         address: "",
@@ -129,19 +129,20 @@ export default function SignUpPage({ setUser }) {
 
   return (
     <div className="fixed inset-0 flex w-full h-full">
-      <div className="absolute top-[-500px] left-[-200px] w-[700px] h-[700px] bg-gradient-to-br from-[#FF90C6] to-[#002aff] rounded-full"></div>
-      <div className="absolute bottom-[-160px] right-[-350px] w-[400px] h-[400px] bg-gradient-to-bl from-[#b6c4ff61] to-[#ff9ecdd9] rounded-full"></div>
+      {/* Background Bubbles */}
+      <div className="absolute top-[-500px] left-[-200px] w-[700px] h-[700px] bg-gradient-to-br from-[#FF90C6] to-[#002aff] rounded-full z-0"></div>
+      <div className="absolute bottom-[-160px] right-[-350px] w-[400px] h-[400px] bg-gradient-to-bl from-[#b6c4ff61] to-[#ff9ecdd9] rounded-full z-0"></div>
 
-      {/* Left Side - Illustration */}
+      {/* Left Illustration */}
       <div className="hidden md:flex w-1/2 items-center justify-center bg-white">
         <img src={illustration} alt="Illustration" className="w-3/4" />
       </div>
 
-      {/* Right Side - Sign Up Form */}
-      <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
+      {/* Right Form Panel */}
+      <div className="w-full md:w-1/2 px-4 sm:px-6 lg:px-8 flex flex-col justify-start relative z-10 mt-10 overflow-y-auto max-h-screen">
         <div className="flex flex-col items-center">
           <div className="flex items-center space-x-2">
-            <img src={Signup} alt="Talkmate Logo" className="w-25 h-25" />
+            <img src={Signup} alt="Talkmate Logo" className="w-23 h-20" />
           </div>
           <p className="text-xl font-bold">Sign Up</p>
         </div>
@@ -149,7 +150,7 @@ export default function SignUpPage({ setUser }) {
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
         {/* Input Fields with Icons */}
-        <div className="grid grid-cols-2 gap-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <InputField
             icon={<AiOutlineUser />}
             placeholder="First Name"
@@ -175,13 +176,13 @@ export default function SignUpPage({ setUser }) {
             value={mobileNumber}
             setValue={setMobileNumber}
           />
-          <div className="col-span-2 flex flex-col">
+          <div className="md:col-span-2 flex flex-col">
             <InputField
               icon={<FaMapMarkerAlt />}
               placeholder="Address"
               value={address}
               setValue={setAddress}
-              isTextarea={true} // Ensure it renders as a textarea
+              isTextarea={true}
             />
           </div>
 
@@ -219,7 +220,7 @@ export default function SignUpPage({ setUser }) {
         </Button>
 
         {/* Already have an account */}
-        <div className="mt-6 text-center text-sm">
+        <div className="mt-6 text-center text-sm mb-8 md:mb-0">
           Already have an account?{" "}
           <Link
             to="/login"
